@@ -59,13 +59,13 @@ def main():
     st.markdown("""
     <div class="main-header">
         <h1>👞 Calzados "Nihjardi"</h1>
-        <h2>Diagnóstico Organizacional 2025</h2>
+        <h2>Diagnóstico Organizacional 2024</h2>
         <p>Análisis integral del proceso de cambio organizacional</p>
     </div>
     """, unsafe_allow_html=True)
     
     # Tabs para navegación
-    tab1, tab2, tab3, tab4 = st.tabs(["📊 Dashboard", "📋 Encuesta", "📈 Análisis", "💡 Recomendaciones"])
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["📊 Dashboard", "📋 Encuesta", "📈 Análisis", "🔄 Curva Kübler-Ross", "💡 Recomendaciones"])
     
     with tab1:
         show_dashboard()
@@ -77,6 +77,9 @@ def main():
         show_analysis()
     
     with tab4:
+        show_kubler_ross()
+    
+    with tab5:
         show_recommendations()
 
 def show_dashboard():
@@ -356,6 +359,201 @@ def show_analysis():
         - Oportunidades de crecimiento
         - Eficiencia operativa
         - Satisfacción del cliente
+        """)
+
+def show_kubler_ross():
+    st.header("🔄 Curva del Cambio de Kübler-Ross")
+    st.subheader("Aplicada en Calzados 'Nihjardi'")
+    
+    # Datos de las etapas
+    etapas_data = {
+        'Etapa': ['Shock', 'Negación', 'Frustración', 'Depresión', 'Experimentación', 'Decisión', 'Integración'],
+        'Nivel_Confianza': [80, 70, 45, 25, 55, 80, 95],
+        'Tiempo': [0, 1, 2, 3, 4, 5, 6],
+        'Color': ['#FCD34D', '#EF4444', '#F97316', '#3B82F6', '#F59E0B', '#10B981', '#8B5CF6'],
+        'Descripcion': [
+            "Sorpresa inicial ante el anuncio del cambio",
+            "Incredulidad sobre la necesidad de cambiar",
+            "Incomodidad durante la implementación inicial",
+            "Descenso del ánimo durante la adaptación",
+            "Disposición a probar nuevas formas de trabajo",
+            "Aceptación consciente del nuevo contexto",
+            "Integración de nuevos hábitos en la cultura"
+        ],
+        'Frases_Tipicas': [
+            "¿Por qué tenemos que cambiar ahora?",
+            "Así siempre se ha trabajado",
+            "Esto es más complicado",
+            "Esto es muy cansado",
+            "Vamos a intentar esto",
+            "Ahora entiendo cómo funciona",
+            "Así es como trabajamos ahora"
+        ],
+        'Estrategias': [
+            "Conversaciones informales y escucha activa",
+            "Reuniones pequeñas con ejemplos concretos",
+            "Comunicación incrementada y resolución de dudas",
+            "Reconocimiento verbal y recompensas simbólicas",
+            "Capacitación breve y participación activa",
+            "Intercambio de experiencias exitosas",
+            "Anclar nuevos hábitos en la identidad"
+        ]
+    }
+    
+    df_etapas = pd.DataFrame(etapas_data)
+    
+    # Selector de etapa
+    etapa_seleccionada = st.selectbox(
+        "Selecciona una etapa para ver detalles:",
+        options=df_etapas['Etapa'].tolist(),
+        index=0
+    )
+    
+    etapa_idx = df_etapas[df_etapas['Etapa'] == etapa_seleccionada].index[0]
+    
+    # Gráfico de la curva
+    st.subheader("📈 Evolución del Equipo a través del Cambio")
+    
+    fig_curva = go.Figure()
+    
+    # Línea de la curva
+    fig_curva.add_trace(go.Scatter(
+        x=df_etapas['Tiempo'],
+        y=df_etapas['Nivel_Confianza'],
+        mode='lines+markers',
+        name='Nivel de Confianza',
+        line=dict(color='#EA580C', width=4, shape='spline'),
+        marker=dict(size=10, color=df_etapas['Color'], line=dict(width=2, color='white')),
+        hovertemplate='<b>%{text}</b><br>Confianza: %{y}%<br>Tiempo: Mes %{x}<extra></extra>',
+        text=df_etapas['Etapa']
+    ))
+    
+    # Destacar etapa seleccionada
+    fig_curva.add_trace(go.Scatter(
+        x=[df_etapas.iloc[etapa_idx]['Tiempo']],
+        y=[df_etapas.iloc[etapa_idx]['Nivel_Confianza']],
+        mode='markers',
+        name='Etapa Actual',
+        marker=dict(size=20, color='red', symbol='star'),
+        showlegend=False
+    ))
+    
+    # Área bajo la curva
+    fig_curva.add_trace(go.Scatter(
+        x=df_etapas['Tiempo'],
+        y=df_etapas['Nivel_Confianza'],
+        fill='tonexty',
+        fillcolor='rgba(234, 88, 12, 0.2)',
+        line=dict(color='rgba(255,255,255,0)'),
+        showlegend=False,
+        hoverinfo='skip'
+    ))
+    
+    fig_curva.update_layout(
+        title="Curva del Cambio de Kübler-Ross - Calzados Nihjardi",
+        xaxis_title="Tiempo (Meses)",
+        yaxis_title="Nivel de Confianza y Competencia (%)",
+        height=500,
+        hovermode='closest',
+        yaxis=dict(range=[0, 100])
+    )
+    
+    # Añadir anotaciones para cada etapa
+    for i, row in df_etapas.iterrows():
+        fig_curva.add_annotation(
+            x=row['Tiempo'],
+            y=row['Nivel_Confianza'] + 8,
+            text=row['Etapa'],
+            showarrow=False,
+            font=dict(size=10, color='black'),
+            bgcolor='white',
+            bordercolor='gray',
+            borderwidth=1
+        )
+    
+    st.plotly_chart(fig_curva, use_container_width=True)
+    
+    # Detalles de la etapa seleccionada
+    st.subheader(f"🔍 Detalle: {etapa_seleccionada}")
+    
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        st.metric(
+            label="Nivel de Confianza",
+            value=f"{df_etapas.iloc[etapa_idx]['Nivel_Confianza']}%",
+            delta=f"Mes {df_etapas.iloc[etapa_idx]['Tiempo']}"
+        )
+    
+    with col2:
+        fase = "🔴 Crítica" if etapa_idx < 3 else "🟡 Recuperación" if etapa_idx < 5 else "🟢 Consolidación"
+        st.metric(
+            label="Fase del Proceso",
+            value=fase
+        )
+    
+    with col3:
+        progreso = ((etapa_idx + 1) / len(df_etapas)) * 100
+        st.metric(
+            label="Progreso General",
+            value=f"{progreso:.0f}%"
+        )
+    
+    # Información detallada
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.info(f"""
+        **📋 Situación del Equipo**
+        
+        {df_etapas.iloc[etapa_idx]['Descripcion']}
+        """)
+        
+        st.warning(f"""
+        **💬 Frase Típica**
+        
+        "{df_etapas.iloc[etapa_idx]['Frases_Tipicas']}"
+        """)
+    
+    with col2:
+        st.success(f"""
+        **🎯 Estrategia Aplicada**
+        
+        {df_etapas.iloc[etapa_idx]['Estrategias']}
+        """)
+        
+        # Progreso visual
+        st.write("**📊 Progreso de la Etapa**")
+        progress_bar = st.progress(df_etapas.iloc[etapa_idx]['Nivel_Confianza'] / 100)
+    
+    # Navegación entre etapas
+    col1, col2, col3 = st.columns([1, 2, 1])
+    
+    with col1:
+        if st.button("⬅️ Etapa Anterior", disabled=(etapa_idx == 0)):
+            st.rerun()
+    
+    with col2:
+        st.write(f"**Etapa {etapa_idx + 1} de {len(df_etapas)}**")
+    
+    with col3:
+        if st.button("Siguiente Etapa ➡️", disabled=(etapa_idx == len(df_etapas) - 1)):
+            st.rerun()
+    
+    # Resumen final si está en la última etapa
+    if etapa_idx == len(df_etapas) - 1:
+        st.success("""
+        ### 🎉 ¡Proceso de Cambio Exitoso!
+        
+        El equipo de Calzados "Nihjardi" ha completado exitosamente su proceso de transformación organizacional. 
+        Los nuevos hábitos y prácticas se han integrado en la cultura empresarial, manteniendo la esencia 
+        artesanal mientras se mejora la eficiencia operativa.
+        
+        **Resultados Finales:**
+        - ⏱️ **Tiempo Total:** 6 meses
+        - 📈 **Nivel de Integración:** 95%
+        - 😊 **Satisfacción del Equipo:** Alta
+        - 🎯 **Objetivos Cumplidos:** Exitosamente
         """)
 
 def show_recommendations():
