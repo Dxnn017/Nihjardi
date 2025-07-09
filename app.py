@@ -59,7 +59,7 @@ def main():
     st.markdown("""
     <div class="main-header">
         <h1>👞 Calzados "Nihjardi"</h1>
-        <h2>Diagnóstico Organizacional 2024</h2>
+        <h2>Diagnóstico Organizacional 2025</h2>
         <p>Análisis integral del proceso de cambio organizacional</p>
     </div>
     """, unsafe_allow_html=True)
